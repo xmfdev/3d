@@ -18,14 +18,16 @@ Built from scratch on top of [raylib](https://github.com/raysan5/raylib).
 
 ## Building
 
+Clone the repository on your machine and run the following commands (assuming pwd is aforementioned).
+
 ```sh
-git clone https://github.com/xmfdev/3d
-cd 3d
 cmake -S . -B build
 cmake --build build
 ```
 
 ## Running
+
+After building run the command below.
 
 ```sh
 ./build/bin
