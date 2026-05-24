@@ -18,7 +18,7 @@ Built from scratch on top of [raylib](https://github.com/raysan5/raylib).
 
 ## Building
 
-Clone the repository on your machine and run the following commands (assuming pwd is aforementioned).
+Clone the repository and run the following commands (assuming pwd is aforementioned).
 
 ```sh
 cmake -S . -B build
