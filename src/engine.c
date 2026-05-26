@@ -6,6 +6,7 @@
 
 static float angle = 0.0;
 
+// clang-format off
 static Vec4 vertices[] = {
     {.x = 0.25, .y = 0.25, .z = 0.25, .w = 1},
     {.x = 0.25, .y = -0.25, .z = 0.25, .w = 1},
@@ -26,22 +27,21 @@ static int faces[][4] = {
     {2, 6, -1, -1},
     {3, 7, -1, -1}
 };
+// clang-format on
 
-void Engine_render(void)
+void Engine_draw_cube(void)
 {
-    BeginDrawing();
-    ClearBackground(BLACK);
+    angle += PI / 2 * GetFrameTime();
 
-    angle += PI * GetFrameTime();
+    Mat4 rot_mat = Mat4_rotateXZ(angle);
+    Mat4 trans_mat = Mat4_translate_z(1);
+    Mat4 mat = Mat4_multiply(&rot_mat, &trans_mat);
 
-    // TODO: Use a single matrix for rotating and translating.
     for (size_t i = 0; i < sizeof(vertices) / sizeof(Vec4); i++) {
-        Vec4 rot = Vec4_rotateXZ(vertices[i], angle);
-        Vec4 trans = Vec4_translate_z(rot, 1);
+        Vec4 trans = Vec4_transform(vertices[i], &mat);
         Vec2 proj = Vec4_project(trans);
         Vec2 screen = Vec2_screen(proj);
 
-        // DrawRectangle(screen.x, screen.y, 10, 10, GREEN);
         DrawPixel(screen.x, screen.y, GREEN);
     }
 
@@ -63,20 +63,24 @@ void Engine_render(void)
             Vec4 a = vertices[faces[i][j]];
             Vec4 b = vertices[next];
 
-            Vec4 rot_a = Vec4_rotateXZ(a, angle);
-            Vec4 trans_a = Vec4_translate_z(rot_a, 1);
-            Vec2 proj_a = Vec4_project(trans_a);
-            Vec2 screen_a = Vec2_screen(proj_a);
+            Vec4 trans = Vec4_transform(a, &mat);
+            Vec2 proj = Vec4_project(trans);
+            Vec2 screen_a = Vec2_screen(proj);
 
-            Vec4 rot_b = Vec4_rotateXZ(b, angle);
-            Vec4 trans_b = Vec4_translate_z(rot_b, 1);
-            Vec2 proj_b = Vec4_project(trans_b);
-            Vec2 screen_b = Vec2_screen(proj_b);
+            trans = Vec4_transform(b, &mat);
+            proj = Vec4_project(trans);
+            Vec2 screen_b = Vec2_screen(proj);
 
             DrawLine(screen_a.x, screen_a.y, screen_b.x, screen_b.y, GREEN);
         }
     }
+}
 
+void Engine_render(void)
+{
+    BeginDrawing();
+    ClearBackground(BLACK);
+    Engine_draw_cube();
     EndDrawing();
 }
 
