@@ -42,6 +42,7 @@ target_compile_options(
     PRIVATE
     -Wall
     -Werror
+    -std=c99
     $<$<CONFIG:Debug>:-ggdb>
 )
 
