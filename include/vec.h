@@ -36,4 +36,3 @@ Vec2 Vec4_project(Vec4 v);
 Vec2 Vec2_screen(Vec2 v);
 
 #endif
-

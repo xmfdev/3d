@@ -1,5 +1,7 @@
 #include "engine.h"
+#include "mesh.h"
 #include "raylib.h"
+#include "utils.h"
 #include "vec.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -28,6 +30,26 @@ static int faces[][4] = {
     {3, 7, -1, -1}
 };
 // clang-format on
+
+
+
+void Engine_draw_model(My_Mesh mesh)
+{
+    static const float scale = 0.005f;
+    static const float z_offset = 1.0f;
+
+    for (int i = 0; i < mesh.count; ++i) {
+        Vec4 v = {
+            .x = mesh.v[i].x * scale,
+            .y = mesh.v[i].y * scale,
+            .z = mesh.v[i].z * scale + z_offset,
+            .w = 1,
+        };
+        Vec2 proj = Vec4_project(v);
+        Vec2 screen = Vec2_screen(proj);
+        DrawPixel(screen.x, screen.y, GREEN);
+    }
+}
 
 void Engine_draw_cube(void)
 {
@@ -76,11 +98,27 @@ void Engine_draw_cube(void)
     }
 }
 
+void Engine_display_fps(void)
+{
+    char *str = Utils_make_fps_str();
+    DrawText(str, 0, 0, 1, GREEN);
+    free(str);
+}
+
 void Engine_render(void)
 {
+    static My_Mesh mesh = {0};
+    static int loaded = 0;
+    if (!loaded) {
+        mesh = Mesh_read_model();
+        loaded = 1;
+    }
+
     BeginDrawing();
     ClearBackground(BLACK);
-    Engine_draw_cube();
+    Engine_display_fps();
+    // Engine_draw_cube();
+    Engine_draw_model(mesh);
     EndDrawing();
 }
 
