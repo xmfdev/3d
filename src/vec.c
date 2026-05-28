@@ -73,6 +73,14 @@ Mat4 Mat4_rotateXZ(float rad)
     return mat;
 }
 
+// Returns a matrix that when multiplied by a vector, translates it on the Y axis.
+Mat4 Mat4_translate_y(float delta)
+{
+    Mat4 mat = Mat4_make_id();
+    mat.m[3][1] = delta;
+    return mat;
+}
+
 // Returns a matrix that when multiplied by a vector, translates it on the Z axis.
 Mat4 Mat4_translate_z(float delta)
 {
@@ -83,7 +91,7 @@ Mat4 Mat4_translate_z(float delta)
 
 // Projects from 3D to 2D via perspective divide, returning NDC coordinates in [-1, 1].
 // TODO: If `v.z` is 0 or negative, the point is on or behind the camera - do not call this.
-Vec2 Vec4_project(Vec4 v)
+Vec2 Vec4_to_ndc(Vec4 v)
 {
     return (Vec2){
         .x = v.x / v.z,

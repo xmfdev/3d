@@ -27,11 +27,12 @@ Mat4 Mat4_make_zero();
 Mat4 Mat4_make_id();
 Mat4 Mat4_multiply(Mat4 *a, Mat4 *b);
 Mat4 Mat4_rotateXZ(float rad);
+Mat4 Mat4_translate_y(float delta);
 Mat4 Mat4_translate_z(float delta);
 
 Vec4 Vec4_make(float x, float y, float z);
 Vec4 Vec4_transform(Vec4 v, const Mat4 *m);
-Vec2 Vec4_project(Vec4 v);
+Vec2 Vec4_to_ndc(Vec4 v);
 
 Vec2 Vec2_screen(Vec2 v);
 

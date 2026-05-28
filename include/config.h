@@ -6,5 +6,8 @@
 #define WINDOW_TITLE "Hello, world!"
 #define TARGET_FPS 60
 
+#define OPERATION_SUCCESS 0
+#define OPERATION_ERROR -1
+
 #endif
 
