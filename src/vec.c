@@ -29,9 +29,9 @@ Mat4 Mat4_multiply(Mat4 *a, Mat4 *b)
     size_t n_cols = sizeof(a->m) / sizeof(a->m[0]);
     size_t n_rows = sizeof(a->m[0]) / sizeof(a->m[0][0]);
 
-    for (size_t i = 0; i < n_cols; i++) {
-        for (size_t j = 0; j < n_rows; j++) {
-            for (size_t k = 0; k < n_cols; k++) {
+    for (size_t i = 0; i < n_cols; ++i) {
+        for (size_t j = 0; j < n_rows; ++j) {
+            for (size_t k = 0; k < n_cols; ++k) {
                 result.m[i][j] += a->m[i][k] * b->m[k][j];
             }
         }

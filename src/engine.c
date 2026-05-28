@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "vec.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 static float angle = 0.0;
@@ -29,7 +30,25 @@ static int faces[][4] = {
 };
 // clang-format on
 
-void Engine_draw_cube(void)
+static char *make_string(void)
+{
+    size_t len = snprintf(NULL, 0, "FPS: %d", GetFPS()) + 1;
+    char *buf = malloc(len);
+
+    if (!buf) {
+        return NULL;
+    }
+
+    snprintf(buf, len, "FPS: %d", GetFPS());
+    return buf;
+}
+
+static void display_FPS(void)
+{
+    DrawText(make_string(), 0, 0, 1, GREEN);
+}
+
+static void draw_cube(void)
 {
     angle += PI / 2 * GetFrameTime();
 
@@ -37,7 +56,7 @@ void Engine_draw_cube(void)
     Mat4 trans_mat = Mat4_translate_z(1);
     Mat4 mat = Mat4_multiply(&rot_mat, &trans_mat);
 
-    for (size_t i = 0; i < sizeof(vertices) / sizeof(Vec4); i++) {
+    for (size_t i = 0; i < sizeof(vertices) / sizeof(Vec4); ++i) {
         Vec4 trans = Vec4_transform(vertices[i], &mat);
         Vec2 proj = Vec4_project(trans);
         Vec2 screen = Vec2_screen(proj);
@@ -48,8 +67,8 @@ void Engine_draw_cube(void)
     size_t faces_len = sizeof(faces) / sizeof(faces[0]);
     size_t i_face_len = sizeof(faces[0]) / sizeof(int);
 
-    for (size_t i = 0; i < faces_len; i++) {
-        for (size_t j = 0; j < i_face_len; j++) {
+    for (size_t i = 0; i < faces_len; ++i) {
+        for (size_t j = 0; j < i_face_len; ++j) {
             if (faces[i][j] == -1) {
                 break;
             }
@@ -80,7 +99,8 @@ void Engine_render(void)
 {
     BeginDrawing();
     ClearBackground(BLACK);
-    Engine_draw_cube();
+    display_FPS();
+    draw_cube();
     EndDrawing();
 }
 
