@@ -8,6 +8,13 @@
 #define OBJ_L_START_IDX 2
 #define OBJ_L_SIZE 256
 
+static int str_to_v_idx(char *str, int *out)
+{
+    char *end;
+    *out = (int)strtol(str, &end, 10);
+    return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
+}
+
 static int str_to_v_coor(char *str, float *out)
 {
     char *end;
@@ -89,17 +96,48 @@ static Vec4 load_vertex(char *line)
     };
 }
 
-static size_t num_vertices(FILE *f)
+static size_t get_v_idx_count(char *line)
+{
+    size_t num_spaces = 0;
+    size_t idx = 0;
+
+    while (1) {
+        if (line[idx] == ' ') {
+            ++num_spaces;
+        } else if (line[idx] == '\n' || line[idx] == '\0') {
+            break;
+        }
+
+        ++idx;
+    }
+
+    return num_spaces;
+}
+
+static void set_mesh_data(MyMesh *mesh, FILE *f)
 {
     char line[OBJ_L_SIZE] = {0};
-    size_t count = 0;
+
+    size_t v_count = 0;
+    size_t f_count = 0;
+    size_t v_idx_count = 0;
 
     while (fgets(line, sizeof(line), f)) {
         if (line[0] == 'v' && line[1] == ' ') {
-            ++count;
+            ++v_count;
+        } else if (line[0] == 'f' && line[1] == ' ') {
+            ++f_count;
+            v_idx_count += get_v_idx_count(line);
         }
     }
-    return count;
+
+    mesh->v_count = v_count;
+    mesh->f_count = f_count;
+    mesh->v_idx_count = v_idx_count;
+
+    printf("v_count: %zu\n", mesh->v_count);
+    printf("f_count: %zu\n", mesh->f_count);
+    printf("v_idx_count: %zu\n", mesh->v_idx_count);
 }
 
 static MyMesh *make(void)
@@ -131,7 +169,7 @@ MyMesh *Mesh_load_from_file(char *path)
         return NULL;
     }
 
-    mesh->v_count = num_vertices(f);
+    set_mesh_data(mesh, f);
     mesh->vs = malloc(sizeof(Vec4) * mesh->v_count);
 
     if (mesh->vs == NULL) {
