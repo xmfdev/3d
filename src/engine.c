@@ -5,27 +5,17 @@
 #include "vec.h"
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 static float angle = 0.0f;
 static MyMesh *cat_mesh = NULL;
-
-static char *make_string(void)
-{
-    size_t len = snprintf(NULL, 0, "FPS: %d", GetFPS()) + 1;
-    char *buf = malloc(len);
-
-    if (!buf) {
-        return NULL;
-    }
-
-    snprintf(buf, len, "FPS: %d", GetFPS());
-    return buf;
-}
+static Mat4 tz_mat;
+static Mat4 ty_mat;
 
 static void display_FPS(void)
 {
-    DrawText(make_string(), 0, 0, 1, GREEN);
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "FPS: %d", GetFPS());
+    DrawText(buf, 0, 0, 1, GREEN);
 }
 
 static void draw_cat(void)
@@ -33,8 +23,6 @@ static void draw_cat(void)
     angle += PI / 4 * GetFrameTime();
 
     Mat4 rot_mat = Mat4_rotateXZ(angle);
-    Mat4 tz_mat = Mat4_translate_z(700);
-    Mat4 ty_mat = Mat4_translate_y(-200);
     Mat4 trans_mat = Mat4_multiply(&tz_mat, &ty_mat);
     Mat4 mat = Mat4_multiply(&rot_mat, &trans_mat);
 
@@ -50,6 +38,9 @@ static void draw_cat(void)
 void Engine_setup(void)
 {
     SetTargetFPS(TARGET_FPS);
+
+    tz_mat = Mat4_translate_z(700);
+    ty_mat = Mat4_translate_y(-200);
 
     cat_mesh = Mesh_load_from_file("assets/cat.obj");
 

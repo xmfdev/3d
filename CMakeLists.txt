@@ -43,10 +43,17 @@ target_compile_options(
     -Wall
     -Werror
     -std=c99
+    -fsanitize=address
     $<$<CONFIG:Debug>:-ggdb>
 )
 
 target_include_directories(${BINARY_NAME} PRIVATE ${INCLUDE_DIR})
+
+target_link_options(
+    ${BINARY_NAME}
+    PRIVATE
+    -fsanitize=address
+)
 
 target_link_libraries(
     ${BINARY_NAME}

@@ -1,7 +1,7 @@
 # 3D - fun in three dimensions
 
 A software 3D graphics demo written in C.
-Renders a wireframe cube with perspective projection and Y-axis rotation.
+Renders a model with perspective projection and Y-axis rotation.
 Built from scratch on top of [raylib](https://github.com/raysan5/raylib).
 
 ## Features

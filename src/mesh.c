@@ -8,13 +8,13 @@
 #define OBJ_L_START_IDX 2
 #define OBJ_L_SIZE 256
 
-static int str_to_v_idx(char *str, int *out)
-{
-    char *end;
-    *out = (int)strtol(str, &end, 10);
-    return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
-}
-
+// static int str_to_v_idx(char *str, int *out)
+// {
+//     char *end;
+//     *out = (int)strtol(str, &end, 10);
+//     return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
+// }
+//
 static int str_to_v_coor(char *str, float *out)
 {
     char *end;
