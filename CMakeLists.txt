@@ -7,6 +7,16 @@ project(
     LANGUAGES C
 )
 
+# Configure git hooks.
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+        COMMAND git config core.hooksPath hooks
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
+    message(STATUS "Git hooks configured")
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
@@ -41,24 +51,15 @@ target_compile_options(
     ${BINARY_NAME}
     PRIVATE
     -Wall
+    -Wextra
     -Werror
     -std=c99
-    -fsanitize=address
+    -Wconversion
+    -Wshadow
+    -Wnull-dereference
     $<$<CONFIG:Debug>:-ggdb>
 )
 
 target_include_directories(${BINARY_NAME} PRIVATE ${INCLUDE_DIR})
-
-target_link_options(
-    ${BINARY_NAME}
-    PRIVATE
-    -fsanitize=address
-)
-
-target_link_libraries(
-    ${BINARY_NAME}
-    PRIVATE
-    m
-    ${RAYLIB}
-)
+target_link_libraries(${BINARY_NAME} PRIVATE m ${RAYLIB})
 

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+BRANCH=$(git symbolic-ref HEAD | sed "s|refs/heads/||")
+PRE_PUSH_SUCCESS="\033[0;32m[PRE_PUSH]\033[0m"
+PRE_PUSH_ERROR="\033[0;31m[PRE_PUSH]\033[0m"
+
+if ! echo "$BRANCH" | grep -qE "^(feature|fix|chore)/[a-zA-Z0-9-]+$";then
+    echo "$PRE_PUSH_ERROR '$BRANCH' does not match naming convention"
+    echo "$PRE_PUSH_ERROR expected feature/foo, fix/foo, chore/foo"
+    exit 1
+else
+    echo "$PRE_PUSH_SUCCESS '$BRANCH' adheres to naming convention"
+fi
+

@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "config.h"
 #include "vec.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +23,7 @@ static int str_to_v_coor(char *str, float *out)
     return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
 }
 
-static int set_coor_to_val(char *buf, float *x, float *y, float *z, float *w, int n_spaces)
+static int set_coor_to_val(char *buf, float *x, float *y, float *z, float *w, uint64_t n_spaces)
 {
     float coor = 0.0f;
     int i_res = str_to_v_coor(buf, &coor);
@@ -66,7 +67,7 @@ static Vec4 load_vertex(char *line)
     size_t buf_filled = 0;
     size_t n_spaces = 0;
 
-    for (int i = OBJ_L_START_IDX; i < line_blen - 1; ++i) {
+    for (size_t i = OBJ_L_START_IDX; i < line_blen - 1; ++i) {
         if (line[i] != ' ' && line[i] != '\n') {
             buf[buf_filled++] = line[i];
             continue;

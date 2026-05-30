@@ -31,7 +31,7 @@ static void draw_cat(void)
         Vec2 proj = Vec4_to_ndc(trans);
         Vec2 screen = Vec2_screen(proj);
 
-        DrawPixel(screen.x, screen.y, GREEN);
+        DrawPixel((int)screen.x, (int)screen.y, GREEN);
     }
 }
 
