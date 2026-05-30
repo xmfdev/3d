@@ -9,14 +9,14 @@
 #define OBJ_L_START_IDX 2
 #define OBJ_L_SIZE 256
 
-// static int str_to_v_idx(char *str, int *out)
-// {
-//     char *end;
-//     *out = (int)strtol(str, &end, 10);
-//     return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
-// }
-//
-static int str_to_v_coor(char *str, float *out)
+static int str_to_int(char *str, uint32_t *out)
+{
+    char *end;
+    *out = (uint32_t)strtoul(str, &end, 10);
+    return end != str ? OPERATION_SUCCESS : OPERATION_ERROR;
+}
+
+static int str_to_f(char *str, float *out)
 {
     char *end;
     *out = strtof(str, &end);
@@ -26,7 +26,7 @@ static int str_to_v_coor(char *str, float *out)
 static int set_coor_to_val(char *buf, float *x, float *y, float *z, float *w, uint64_t n_spaces)
 {
     float coor = 0.0f;
-    int i_res = str_to_v_coor(buf, &coor);
+    int i_res = str_to_f(buf, &coor);
 
     if (i_res == OPERATION_ERROR) {
         return OPERATION_ERROR;
@@ -100,7 +100,7 @@ static Vec4 load_vertex(char *line)
 static size_t get_v_idx_count(char *line)
 {
     size_t num_spaces = 0;
-    size_t idx = 0;
+    size_t idx = 2;
 
     while (1) {
         if (line[idx] == ' ') {
@@ -113,6 +113,72 @@ static size_t get_v_idx_count(char *line)
     }
 
     return num_spaces;
+}
+
+static int find_next_ch(size_t cur_idx, char target, char *line)
+{
+    for (size_t i = cur_idx + 1; (int)i < (int)strlen(line); ++i) {
+        if (line[i] == target) {
+            return (int)i;
+        }
+    }
+
+    return -1;
+}
+
+static int store_v_idx(char *buf, size_t len, size_t *buf_filled, MyMesh *mesh)
+{
+    uint32_t conversion;
+    int res = str_to_int(buf, &conversion);
+    if (res == -1) {
+        return -1;
+    }
+    memset(buf, '\0', len);
+    *buf_filled = 0;
+    mesh->v_idx_buf[mesh->v_idx_count++] = conversion;
+    return 0;
+}
+
+static int load_v_indices(char *line, MyMesh *mesh)
+{
+    size_t line_blen = strlen(line) + 1;
+    char buf[30] = {'\0'};
+    size_t buf_filled = 0;
+    int loaded_total = 0;
+
+    for (size_t i = OBJ_L_START_IDX; i < line_blen; ++i) {
+        if (line[i] == '\n') {
+            if (buf_filled > 0) {
+
+            store_v_idx(buf, sizeof(buf), &buf_filled, mesh);
+            ++loaded_total;
+            }
+            break;
+        } else if (line[i] == '/') {
+            int nidx = find_next_ch(i, ' ', line);
+
+            if (nidx != -1) {
+                i = (size_t)nidx;
+                store_v_idx(buf, sizeof(buf), &buf_filled, mesh);
+                ++loaded_total;
+                continue;
+            }
+
+            store_v_idx(buf, sizeof(buf), &buf_filled, mesh);
+            ++loaded_total;
+            break;
+        } else if (line[i] == ' ') {
+            if (buf_filled > 0) {
+                store_v_idx(buf, sizeof(buf), &buf_filled, mesh);
+                ++loaded_total;
+            }
+            continue;
+        }
+
+        buf[buf_filled++] = line[i];
+    }
+
+    return loaded_total;
 }
 
 static void set_mesh_data(MyMesh *mesh, FILE *f)
@@ -172,23 +238,43 @@ MyMesh *Mesh_load_from_file(char *path)
 
     set_mesh_data(mesh, f);
     mesh->vs = malloc(sizeof(Vec4) * mesh->v_count);
+    mesh->fs = malloc(sizeof(Face) * mesh->f_count);
+    mesh->v_idx_buf = malloc(sizeof(uint32_t) * mesh->v_idx_count);
 
-    if (mesh->vs == NULL) {
+    if (mesh->vs == NULL || mesh->fs == NULL || mesh->v_idx_buf == NULL) {
         fclose(f);
+        free(mesh->vs);
+        free(mesh->fs);
+        free(mesh->v_idx_buf);
         free(mesh);
         return NULL;
     }
 
     char line[OBJ_L_SIZE] = {0};
     size_t idx = 0;
+    int loaded_indices = 0;
+    int loaded_indices_total = 0;
+    int loaded_faces = 0;
 
+    mesh->v_idx_count = 0;
     rewind(f);
     while (fgets(line, sizeof(line), f)) {
-        if (line[0] != 'v' || line[1] != ' ') {
+        if (line[0] == 'v' && line[1] == ' ') {
+            mesh->vs[idx++] = load_vertex(line);
             continue;
         }
 
-        mesh->vs[idx++] = load_vertex(line);
+        if (line[0] == 'f' && line[1] == ' ') {
+            loaded_indices = load_v_indices(line, mesh);
+            Face face = {.start = (uint32_t)loaded_indices_total,
+                         .count = (uint32_t)loaded_indices};
+            // printf("loaded face (start = %d, count = %d)\n", loaded_indices_total, loaded_indices);
+            loaded_indices_total += loaded_indices;
+            mesh->fs[loaded_faces++] = face;
+            continue;
+        }
+
+        continue;
     }
 
     fclose(f);
