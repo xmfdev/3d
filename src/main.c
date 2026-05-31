@@ -4,6 +4,7 @@
 
 int main(void)
 {
+    SetConfigFlags(FLAG_WINDOW_UNDECORATED | FLAG_FULLSCREEN_MODE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
     Engine_setup();
 
