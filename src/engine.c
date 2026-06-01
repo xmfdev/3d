@@ -101,7 +101,7 @@ void Engine_setup(void)
     transformed = malloc(sizeof(Vec4) * cat_mesh->v_count);
 
     // Mat4 tz_mat = Mat4_translate_z(700);
-    Mat4 tz_mat = Mat4_translate_z(200);
+    Mat4 tz_mat = Mat4_translate_z(400);
     Mat4 ty_mat = Mat4_translate_y(-200);
     trans_mat = Mat4_multiply(&tz_mat, &ty_mat);
 

@@ -90,12 +90,13 @@ Mat4 Mat4_translate_z(float delta)
 }
 
 // Projects from 3D to 2D via perspective divide, returning NDC coordinates in [-1, 1].
-// TODO: If `v.z` is 0 or negative, the point is on or behind the camera - do not call this.
+// TODO: This should be a matrix.
+// TODO: Aspect ratio should be moved to a separate function.
 Vec2 Vec4_to_ndc(Vec4 v)
 {
     return (Vec2){
-        .x = v.x / v.z,
-        .y = v.y / v.z,
+        .x = v.x / v.z / ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT),
+        .y = v.y / v.z / ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT),
     };
 }
 
