@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NEAR_CLIP_Z (float)10
+#define NEAR_CLIP_Z (float)2
 
 static float angle = 0.0f;
 static MyMesh *cat_mesh = NULL;
@@ -100,9 +100,8 @@ void Engine_setup(void)
     cat_mesh = Mesh_load_from_file("assets/cat.obj");
     transformed = malloc(sizeof(Vec4) * cat_mesh->v_count);
 
-    // Mat4 tz_mat = Mat4_translate_z(700);
-    Mat4 tz_mat = Mat4_translate_z(400);
-    Mat4 ty_mat = Mat4_translate_y(-200);
+    Mat4 tz_mat = Mat4_translate_z(5);
+    Mat4 ty_mat = Mat4_translate_y(1);
     trans_mat = Mat4_multiply(&tz_mat, &ty_mat);
 
     // TODO: Logger file.
